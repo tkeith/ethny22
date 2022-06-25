@@ -13,7 +13,6 @@ export default function Explore() {
       <div id="para" class="glitch-embed-wrap">
         <iframe id="glitch" src="https://glitch.com/embed/#!/embed/generative-trees?path=index.html&previewSize=100"></iframe>
       </div>
-      <button id="generateGif" onClick={generateGif}>Generate Tree GIF</button>
     </Frame>
   </>
 }
