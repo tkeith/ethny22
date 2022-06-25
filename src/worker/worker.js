@@ -62,6 +62,23 @@ async function checkForNewEvents() {
       { upsert: true },
     )
     console.log(updateRes);
+    if (updateRes.modifiedCount > 0 || updateRes.upsertedCount > 0) {
+
+      // some change was made
+      let image;
+      if (rarity == 0) {
+        image = "https://demo.storj-ipfs.com/ipfs/QmQo2tQZaQujodPRYQGmYFC6umNhsEwqEsx4mZpPn8uLkc";
+      } else {
+        image = "https://demo.storj-ipfs.com/ipfs/QmcZTSMUMvFftMqqUBFy5jVyEXgAGmRSt2X8LqGLBc5QPU";
+      }
+      const updateImageRes = await db.collection('trees').updateOne(
+        { tokenId: tokenId },
+        { $set: { image: image } },
+        {},
+      );
+      console.log(updateImageRes);
+
+    }
   }
 }
 

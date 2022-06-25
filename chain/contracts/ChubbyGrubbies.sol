@@ -97,6 +97,14 @@ contract ChubbyGrubbies is ERC721 {
     owners[tokenId].push(Owner(block.timestamp, to));
   }
 
+  // function tokenURI(uint256 tokenId) override public view returns(string memory) {
+  //   require(isTree(tokenId), "Invalid token ID");
+  //   return "https://demo.storj-ipfs.com/ipfs/" + ipfsHashes[tokenId];
+  // }
+  function _baseURI() override internal pure returns(string memory) {
+    return "https://demo.storj-ipfs.com/ipfs/";
+  }
+
   function _emitTreeChange(uint256 tokenId) internal {
     emit TreeChange(
       tokenId,
