@@ -15,15 +15,19 @@ contract ChubbyGrubbies is ERC721 {
     uint256 rarity; // 0 if not sprouted
     uint256 size;
     Owner[] owners;
-    uint256 ownersHash;
+    // bytes32 ownersHash;
     string ipfsHash;
   }
 
   // Dynamic mint cost = mintCostFixed + 2 ^ (mintCostPowerMultiplier * tokenId)
 
-  uint256 mintCost = 1000000000000000000 / 1000;        // 1/1000 ETH - TODO remove when dynamic mint cost is implemented
-  uint256 growthDivisor = 1000000000000000000 / 1000;   // 1/1000 ETH per meter
-  uint256 sproutSize = 1;                               // meters needed before the tree sprouts
+  uint256 mintCost = 1000000000000000000 / 1000;                // 1/1000 ETH - TODO remove when dynamic mint cost is implemented
+  uint256 growthDivisor = 1000000000000000000 / 1000;           // 1/1000 ETH per meter
+  uint256 sproutSize = 1;                                       // meters needed before the tree sprouts
+  address admin = 0xc4d78162471cFFd293850C6ed4FD618240a75F1b;   // allowed to push IPFS hashes
+
+  string loadingIpfsHash = "QmcZTSMUMvFftMqqUBFy5jVyEXgAGmRSt2X8LqGLBc5QPU";
+  string seedIpfsHash = "QmQo2tQZaQujodPRYQGmYFC6umNhsEwqEsx4mZpPn8uLkc";
 
   Counters.Counter numberOfTrees;
 
@@ -40,7 +44,10 @@ contract ChubbyGrubbies is ERC721 {
   );
 
   event TreeChange(
-    uint256 tokenId
+    uint256 tokenId,
+    uint256 rarity,
+    uint256 size,
+    Owner[] owners
   );
 
   function getTreeDisplay(uint256 tokenId) public view returns(TreeDisplay memory) {
@@ -49,7 +56,7 @@ contract ChubbyGrubbies is ERC721 {
       rarities[tokenId],
       sizes[tokenId],
       owners[tokenId],
-      keccak256(owners[tokenId]),
+      // keccak256(owners[tokenId]),
       ipfsHashes[tokenId]
     );
   }
@@ -90,8 +97,18 @@ contract ChubbyGrubbies is ERC721 {
     owners[tokenId].push(Owner(block.timestamp, to));
   }
 
+  function _emitTreeChange(uint256 tokenId) internal {
+    emit TreeChange(
+      tokenId,
+      rarities[tokenId],
+      sizes[tokenId],
+      owners[tokenId]
+    );
+  }
+
   function plantSeed() public payable {
     uint256 thisMintCost = getCurrentMintCost();
+
     require(msg.value >= thisMintCost, "Mint cost not covered");
 
     numberOfTrees.increment();
@@ -99,16 +116,29 @@ contract ChubbyGrubbies is ERC721 {
     uint256 newTokenId = numberOfTrees.current();
     _mint(newOwner, newTokenId);
 
+    ipfsHashes[newTokenId] = seedIpfsHash;
+
     _handleTreeGrowth(newTokenId, msg.value - thisMintCost);
 
     emit SeedPlanted(newOwner, newTokenId);
-    emit TreeChange(newTokenId);
+    _emitTreeChange(newTokenId);
+  }
+
+  function setIpfsHash(uint256 tokenId, string calldata ipfsHash) public {
+    require(msg.sender == admin);
+    require(isTree(tokenId), "Invalid token ID");
+
+    ipfsHashes[tokenId] = ipfsHash;
   }
 
   function growTree(uint256 tokenId) public payable {
     require(isTree(tokenId), "Invalid token ID");
     require(msg.value > 0, "Must spend to grow tree");
+
     _handleTreeGrowth(tokenId, msg.value);
-    emit TreeChange(tokenId);
+
+    ipfsHashes[tokenId] = loadingIpfsHash;
+
+    _emitTreeChange(tokenId);
   }
 }

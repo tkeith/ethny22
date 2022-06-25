@@ -11,8 +11,10 @@ module.exports = {
   defaultNetwork: "boba",
   networks: {
     boba: {
-      url: "https://mainnet.boba.network/",
-      accounts: [process.env.PRIVATE_KEY]
+      // url: "https://mainnet.boba.network/",
+      url: "https://rinkeby.boba.network",
+      accounts: [process.env.PRIVATE_KEY],
+      chainId: 28,
     }
   },
   etherscan: {
@@ -23,11 +25,12 @@ module.exports = {
     customChains: [
       {
         network: "boba",
-        chainId: 288,
+        // chainId: 288,
+        chainId: 28,
         urls: {
           // apiURL: "https://blockexplorer.boba.network/api",
-          apiURL: "https://blockexplorer.boba.network/api/eth-rpc",
-          browserURL: "https://blockexplorer.boba.network"
+          apiURL: "https://blockexplorer.rinkeby.boba.network/api/eth-rpc",
+          browserURL: "https://blockexplorer.rinkeby.boba.network/"
         }
       }
     ]
