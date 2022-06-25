@@ -6,6 +6,7 @@ import { Contract } from '@ethersproject/contracts';
 import { useCall, useContractFunction } from '@usedapp/core';
 import Web3 from 'web3'
 import { useState } from 'react';
+import getMongo from '../../lib/mongo.js';
 
 const contract = new Contract(address, new utils.Interface(abi));
 
@@ -41,11 +42,17 @@ export default function Trees({ address, abi }) {
   </>
 }
 
-export async function getServerSideProps() {
-  return {
-    props: {
-      address: address,
-      abi: abi,
-    }
-  }
-}
+// export async function getServerSideProps() {
+//   const mongo = await getMongo()
+//   const myTrees = await mongo.collection('trees').find({  })
+
+//   const myTrees =
+
+//   return {
+//     props: {
+//       address: address,
+//       abi: abi,
+//       myTrees: myTrees,
+//     }
+//   }
+// }

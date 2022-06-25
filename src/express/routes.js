@@ -13,3 +13,9 @@ router.route('/trees').get(async (req, res) => {
     await (await getMongo()).collection('trees').find({}).sort({ tokenId: 1 }).toArray()
   )
 })
+
+// router.route('/treesByOwner/:foo').get(async (req, res) => {
+//   res.json(
+//     await (await getMongo()).collection('trees').find({ currentOwner }).sort({ tokenId: 1 }).toArray()
+//   )
+// })

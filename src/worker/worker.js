@@ -22,6 +22,9 @@ setInterval(() => {
 export const web3 = new Web3(rpcUrl);
 export const myContract = new web3.eth.Contract(abi, address)
 
+const hash = function (b) { for (var a = 0, c = b.length; c--;)a += b.charCodeAt(c), a += a << 10, a ^= a >> 6; a += a << 3; a ^= a >> 11; return ((a + (a << 15) & 4294967295) >>> 0) };
+const hashHex = function (b) { return hash(b).toString(16) };
+
 async function checkForNewEvents() {
   console.log('getting db')
   const db = await getMongo()
@@ -44,12 +47,23 @@ async function checkForNewEvents() {
     const tokenId = parseInt(event.returnValues.tokenId)
     const rarity = parseInt(event.returnValues.rarity)
     const size = parseInt(event.returnValues.size)
-    db.collection('trees').updateOne(
+    console.log(event.returnValues.owners)
+    const owners = []
+    for (const item of event.returnValues.owners) {
+      owners.push(item.owner)
+    }
+
+    const ownerHistory = JSON.stringify(event.returnValues.owners);
+    const ownerHistoryHash = hash(ownerHistory);
+
+    const updateRes = await db.collection('trees').updateOne(
       { tokenId: tokenId },
-      { $set: { rarity: rarity, size: size } },
+      { $set: { rarity: rarity, size: size, owners: owners, currentOwner: owners[owners.length - 1], ownerHistoryHash: ownerHistoryHash, ownerHistoryHashHex: ownerHistoryHash.toString(16) } },
       { upsert: true },
     )
+    console.log(updateRes);
   }
 }
 
-setInterval(checkForNewEvents, 5000)
+checkForNewEvents()
+setInterval(checkForNewEvents, 10000)
