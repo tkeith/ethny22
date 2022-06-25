@@ -5,6 +5,7 @@
     "@headlessui/react": "^1.6.4",
     "@heroicons/react": "^1.0.6",
     "@usedapp/core": "^1.0.0",
+    "@walletconnect/web3-provider": "^1.7.8",
     "axios": "^0.27.2",
     "bullmq": "^1.85.4",
     "cors": "^2.8.5",

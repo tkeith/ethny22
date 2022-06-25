@@ -8,14 +8,28 @@ require("@nomiclabs/hardhat-waffle");
  */
 module.exports = {
   solidity: "0.8.15",
-  defaultNetwork: "matic",
+  defaultNetwork: "boba",
   networks: {
-    matic: {
-      url: "https://polygon-rpc.com/",
+    boba: {
+      url: "https://mainnet.boba.network/",
       accounts: [process.env.PRIVATE_KEY]
     }
   },
   etherscan: {
-    apiKey: process.env.POLYGONSCAN_API_KEY
+    apiKey: {
+      // boba: process.env.BOBA_EXPLORER_API_KEY
+      boba: "asdf"
+    },
+    customChains: [
+      {
+        network: "boba",
+        chainId: 288,
+        urls: {
+          // apiURL: "https://blockexplorer.boba.network/api",
+          apiURL: "https://blockexplorer.boba.network/api/eth-rpc",
+          browserURL: "https://blockexplorer.boba.network"
+        }
+      }
+    ]
   },
 };

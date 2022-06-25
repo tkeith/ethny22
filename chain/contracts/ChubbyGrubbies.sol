@@ -40,7 +40,7 @@ contract ChubbyGrubbies is ERC721 {
     uint256 tokenId
   );
 
-  function getTreeDisplay(uint256 tokenId) public view returns(TreeDisplay) {
+  function getTreeDisplay(uint256 tokenId) public view returns(TreeDisplay memory) {
     require(isTree(tokenId), "Invalid token ID");
     return TreeDisplay(
       rarities[tokenId],
@@ -97,7 +97,7 @@ contract ChubbyGrubbies is ERC721 {
     _handleTreeGrowth(newTokenId, msg.value - thisMintCost);
 
     emit SeedPlanted(newOwner, newTokenId);
-    emit TreeChange(tokenId);
+    emit TreeChange(newTokenId);
   }
 
   function growTree(uint256 tokenId) public payable {
