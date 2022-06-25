@@ -44,7 +44,10 @@ contract ChubbyGrubbies is ERC721 {
   );
 
   event TreeChange(
-    uint256 tokenId
+    uint256 tokenId,
+    uint256 rarity,
+    uint256 size,
+    Owner[] owners
   );
 
   function getTreeDisplay(uint256 tokenId) public view returns(TreeDisplay memory) {
@@ -94,6 +97,15 @@ contract ChubbyGrubbies is ERC721 {
     owners[tokenId].push(Owner(block.timestamp, to));
   }
 
+  function _emitTreeChange(uint256 tokenId) internal {
+    emit TreeChange(
+      tokenId,
+      rarities[tokenId],
+      sizes[tokenId],
+      owners[tokenId]
+    );
+  }
+
   function plantSeed() public payable {
     uint256 thisMintCost = getCurrentMintCost();
 
@@ -109,7 +121,7 @@ contract ChubbyGrubbies is ERC721 {
     _handleTreeGrowth(newTokenId, msg.value - thisMintCost);
 
     emit SeedPlanted(newOwner, newTokenId);
-    emit TreeChange(newTokenId);
+    _emitTreeChange(newTokenId);
   }
 
   function setIpfsHash(uint256 tokenId, string calldata ipfsHash) public {
@@ -127,6 +139,6 @@ contract ChubbyGrubbies is ERC721 {
 
     ipfsHashes[tokenId] = loadingIpfsHash;
 
-    emit TreeChange(tokenId);
+    _emitTreeChange(tokenId);
   }
 }

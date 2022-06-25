@@ -1,4 +1,10 @@
-export const address = '0x7F408A01873Ee670f81285d27B64cBd5bea4FECD';
+// export const chainId = 288;
+// export const rpcUrl = "https://mainnet.boba.network/";
+
+export const chainId = 28;
+export const rpcUrl = "https://rinkeby.boba.network/";
+
+export const address = '0xBE5030Be292286969c5C9D233F730c58639284b0';
 
 export const abi = [
   {
@@ -108,6 +114,36 @@ export const abi = [
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "rarity",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "size",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "begin",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct ChubbyGrubbies.Owner[]",
+        "name": "owners",
+        "type": "tuple[]"
       }
     ],
     "name": "TreeChange",

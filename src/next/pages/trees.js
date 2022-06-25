@@ -1,6 +1,6 @@
 import Frame from '../components/Frame.js';
 import { TextButton } from '../components/examples/misc.js';
-import { address, abi } from '../contract.js';
+import { address, abi } from '../../lib/contract.js';
 import { utils } from 'ethers';
 import { Contract } from '@ethersproject/contracts';
 import { useCall, useContractFunction } from '@usedapp/core';
@@ -9,7 +9,7 @@ import { useState } from 'react';
 
 const contract = new Contract(address, new utils.Interface(abi));
 
-export default function Trees() {
+export default function Trees({ address, abi }) {
   const [mintCost, setMintCost] = useState()
 
   async function getCurrentMintCost() {
@@ -18,7 +18,7 @@ export default function Trees() {
     console.log("Calling allowance: ")
     await contract.methods.getCurrentMintCost().call(function (error, result) {
       console.log("Current mint cost: ", result)
-      setMintCost(result / 1000000000000000000)
+      setMintCost(result)
     })
   }
 
@@ -30,13 +30,22 @@ export default function Trees() {
   const { status } = state
 
   async function doMint() {
-    send({ value: 10000000 })
+    send({ value: mintCost })
   }
 
   return <>
     <Frame title='Trees' accountRequired>
-      <p>Cost to plant a new seed: {mintCost}</p>
+      <p>Cost to plant a new seed: {mintCost / 1000000000000000000} ETH</p>
       <TextButton onClick={() => doMint()}>Plant a new seed</TextButton>
     </Frame>
   </>
+}
+
+export async function getServerSideProps() {
+  return {
+    props: {
+      address: address,
+      abi: abi,
+    }
+  }
 }

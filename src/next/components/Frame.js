@@ -33,6 +33,7 @@ import { useEtherBalance, useEthers } from '@usedapp/core'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { formatEther } from '@ethersproject/units'
 import { TextButton } from '../components/examples/misc.js'
+import { chainId, rpcUrl } from '../../lib/contract.js'
 
 const navigation = [
   { name: 'Explore', href: '/explore', icon: HomeIcon },
@@ -53,7 +54,7 @@ export default function Frame({ children, title, accountRequired }) {
     const provider = new WalletConnectProvider({
       // infuraId: SOME_LONG_API_ID,
       rpc: {
-        288: "https://mainnet.boba.network/",
+        chainId: rpcUrl
       },
     });
     await provider.enable();
