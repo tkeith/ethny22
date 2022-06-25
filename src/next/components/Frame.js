@@ -119,7 +119,7 @@ export default function Frame({ children, title, accountRequired }) {
                   <div className="flex-shrink-0 px-4 flex items-center">
                     <img
                       className="h-8 w-auto"
-                      src="https://tailwindui.com/img/logos/workflow-logo-indigo-600-mark-gray-800-text.svg"
+                      src="nftrees-logo.svg"
                       alt="Workflow"
                     />
                   </div>
@@ -164,8 +164,8 @@ export default function Frame({ children, title, accountRequired }) {
           <div className="border-r border-gray-200 pt-5 flex flex-col flex-grow bg-white overflow-y-auto">
             <div className="flex-shrink-0 px-4 flex items-center">
               <img
-                className="h-8 w-auto"
-                src="https://tailwindui.com/img/logos/workflow-logo-indigo-600-mark-gray-800-text.svg"
+                className="h-11 w-auto"
+                src="nftrees-logo.svg"
                 alt="Workflow"
               />
             </div>
