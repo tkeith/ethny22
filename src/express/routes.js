@@ -14,8 +14,16 @@ router.route('/trees').get(async (req, res) => {
   )
 })
 
-// router.route('/treesByOwner/:foo').get(async (req, res) => {
-//   res.json(
-//     await (await getMongo()).collection('trees').find({ currentOwner }).sort({ tokenId: 1 }).toArray()
-//   )
-// })
+router.route('/treesByUser/:user').get(async (req, res) => {
+  const user = req.params.user;
+  var trees = [];
+
+  for (var tree of (await (await getMongo()).collection('trees').find({ owners: user }).sort({ tokenId: 1 }).toArray())) {
+    tree.currentlyOwned = user == tree.currentOwner;
+    trees.push(tree);
+  }
+
+  res.json(
+    trees
+  )
+})
