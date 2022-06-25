@@ -29,9 +29,13 @@ import {
 } from '@heroicons/react/outline'
 import { SearchIcon } from '@heroicons/react/solid'
 
+import { useEtherBalance, useEthers } from '@usedapp/core'
+import WalletConnectProvider from '@walletconnect/web3-provider'
+import { formatEther } from '@ethersproject/units'
+import { TextButton } from '../components/examples/misc.js'
+
 const navigation = [
   { name: 'Explore', href: '/explore', icon: HomeIcon },
-  { name: 'Plant a Seed', href: '/plant', icon: UsersIcon },
   { name: 'My Trees', href: '/trees', icon: FolderIcon },
 ]
 
@@ -39,8 +43,22 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function Frame({ children, title }) {
+export default function Frame({ children, title, accountRequired }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  const { activateBrowserWallet, account } = useEthers()
+  const etherBalance = useEtherBalance(account)
+
+  const connectWithWalletConnect = async () => {
+    const provider = new WalletConnectProvider({
+      // infuraId: SOME_LONG_API_ID,
+      rpc: {
+        288: "https://mainnet.boba.network/",
+      },
+    });
+    await provider.enable();
+    activateBrowserWallet(provider);
+  }
 
   return (
     <>
@@ -182,12 +200,24 @@ export default function Frame({ children, title }) {
 
             <main className="flex-1">
               <div className="py-6">
-                <div className="px-4 sm:px-6 md:px-0">
-                  <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
-                </div>
-                <div className="px-4 sm:px-6 md:px-0 py-4">
-                  {children}
-                </div>
+                {(account || (!accountRequired)) &&
+                  <>
+                    <div className="px-4 sm:px-6 md:px-0">
+                      <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
+                    </div>
+                    <div className="px-4 sm:px-6 md:px-0 py-4">
+                      {children}
+                    </div>
+                  </> || <>
+                    <div className="px-4 sm:px-6 md:px-0">
+                      <h1 className="text-2xl font-semibold text-gray-900">Please connect your wallet to get started</h1>
+                    </div>
+                    <div className="px-4 sm:px-6 md:px-0 py-4">
+                    <TextButton onClick={() => activateBrowserWallet()}>Connect with MetaMask</TextButton>
+                    <TextButton onClick={() => connectWithWalletConnect()}>Connect with WalletConnect</TextButton>
+                    </div>
+                  </>
+                }
               </div>
             </main>
           </div>

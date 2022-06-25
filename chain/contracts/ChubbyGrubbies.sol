@@ -15,19 +15,22 @@ contract ChubbyGrubbies is ERC721 {
     uint256 rarity; // 0 if not sprouted
     uint256 size;
     Owner[] owners;
+    uint256 ownersHash;
+    string ipfsHash;
   }
 
-  // Mint cost = mintCostFixed + 2 ^ (mintCostPowerMultiplier * tokenId)
-  uint256 mintCost = 1000000000000000000; // 1 ETH - TODO remove when dynamic mint cost is implemented
-  uint256 growthDivisor = 1000000000000000000; // 1 ETH per meter
-  uint256 sproutSize = 1; // meters needed before the tree sprouts
+  // Dynamic mint cost = mintCostFixed + 2 ^ (mintCostPowerMultiplier * tokenId)
+
+  uint256 mintCost = 1000000000000000000 / 1000;        // 1/1000 ETH - TODO remove when dynamic mint cost is implemented
+  uint256 growthDivisor = 1000000000000000000 / 1000;   // 1/1000 ETH per meter
+  uint256 sproutSize = 1;                               // meters needed before the tree sprouts
 
   Counters.Counter numberOfTrees;
 
   mapping(uint256 => uint256) sizes;
   mapping(uint256 => uint256) rarities;
-
   mapping(uint256 => Owner[]) owners;
+  mapping(uint256 => string) ipfsHashes;
 
   constructor() ERC721("ChubbyGrubbies", "CHUBBY") {}
 
@@ -45,7 +48,9 @@ contract ChubbyGrubbies is ERC721 {
     return TreeDisplay(
       rarities[tokenId],
       sizes[tokenId],
-      owners[tokenId]
+      owners[tokenId],
+      keccak256(owners[tokenId]),
+      ipfsHashes[tokenId]
     );
   }
 
