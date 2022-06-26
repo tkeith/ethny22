@@ -37,7 +37,7 @@ import { chainId, rpcUrl } from '../../lib/contract.js'
 
 const navigation = [
   { name: 'Explore', href: '/explore', icon: HomeIcon },
-  { name: 'My Trees', href: '/trees', icon: FolderIcon },
+  { name: 'My Trees', href: '/', icon: FolderIcon },
 ]
 
 function classNames(...classes) {
@@ -199,7 +199,7 @@ export default function Frame({ children, title, accountRequired }) {
         </div>
 
         <div className="md:pl-64">
-          <div className="max-w-4xl mx-auto flex flex-col md:px-8 xl:px-0">
+          <div className="mx-8 mx-auto flex flex-col md:px-8 xl:px-0">
 
             <main className="flex-1">
               <div className="py-6">
