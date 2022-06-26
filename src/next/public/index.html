@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Hello, World! • A-Frame three.ar.js</title>
+    <meta name="description" content="Hello, World! • A-Frame three.ar.js">
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+
+    <style>
+      a-scene { display: block; width: 100%; height: 800px}
+    </style>
+
+    <!-- Import grid shader. -->
+    <script src="grid-shader.js"></script>
+
+    <script>
+      function downloadCanvas() {
+        document.querySelector('a-scene').components.screenshot.capture('perspective');
+      }
+
+      var url = (window.location != window.parent.location)
+            ? document.referrer
+            : document.location.href;
+      console.log(url)
+    </script>
+
+    <!-- Include ShaderFrog import. -->
+    <script src="https://rawgit.com/chenzlabs/aframe-import-shaderfrog/master/aframe-import-shaderfrog.js"></script>
+
+    <script src="https://unpkg.com/aframe-atoll-terrain@^0.7.0/dist/aframe-atoll-terrain.js"></script>
+
+    <script>
+
+    </script>
+
+    <!-- Prevent touch causing flicker on iOS. -->
+    <style> * { -webkit-tap-highlight-color: rgba(0,0,0,0); } </style>
+  </head>
+  <body>
+    <button onclick="downloadCanvas()">
+      To PNG
+    </button>
+
+    <script>
+      AFRAME.registerComponent("generatetrees", {
+        update: function() {
+              fetch("https://tk.co/express/treeSample")
+              .then((response) => response.json())
+              .then((treeData) => {
+                console.log(treeData)
+                for(i=0; i<treeData.length;i++){
+                  let treesize = ((treeData[i].size)/50) + .05
+                  let rarityPos = treeData[i].rarity
+                  if(rarityPos != 0){
+                    rarityPos -= 1
+                  }
+                  let models_rarity = [["https://cdn.glitch.global/6a09ec72-3ff6-4122-abc1-a728eaa0d8c1/simple-tree%20(3).gltf?v=1656213701669","https://cdn.glitch.global/6a09ec72-3ff6-4122-abc1-a728eaa0d8c1/simple-tree%20(4).gltf?v=1656213707686", "https://cdn.glitch.global/6a09ec72-3ff6-4122-abc1-a728eaa0d8c1/simple-tree%20(5).gltf?v=1656213737789", "https://cdn.glitch.global/6a09ec72-3ff6-4122-abc1-a728eaa0d8c1/simple-tree%20(6).gltf?v=1656213742814"],
+                                      ["https://cdn.glitch.global/6a09ec72-3ff6-4122-abc1-a728eaa0d8c1/fruit-tree%20(8).gltf?v=1656175911661","https://cdn.glitch.global/6a09ec72-3ff6-4122-abc1-a728eaa0d8c1/fruit-tree%20(9).gltf?v=1656185199804","https://cdn.glitch.global/6a09ec72-3ff6-4122-abc1-a728eaa0d8c1/fruit-tree%20(11).gltf?v=1656185656356","https://cdn.glitch.global/6a09ec72-3ff6-4122-abc1-a728eaa0d8c1/fruit-tree%20(12).gltf?v=1656185826620"],
+                                      ["https://cdn.glitch.global/6a09ec72-3ff6-4122-abc1-a728eaa0d8c1/pine-tree%20(2).gltf?v=1656214139494", "https://cdn.glitch.global/6a09ec72-3ff6-4122-abc1-a728eaa0d8c1/pine-tree%20(1).gltf?v=1656214142002"],
+                                      ["https://cdn.glitch.global/6a09ec72-3ff6-4122-abc1-a728eaa0d8c1/willow-tree%20(3).gltf?v=1656214090795","https://cdn.glitch.global/6a09ec72-3ff6-4122-abc1-a728eaa0d8c1/willow-tree%20(4).gltf?v=1656214095247","https://cdn.glitch.global/6a09ec72-3ff6-4122-abc1-a728eaa0d8c1/willow-tree%20(6).gltf?v=1656214100763","https://cdn.glitch.global/6a09ec72-3ff6-4122-abc1-a728eaa0d8c1/willow-tree%20(7).gltf?v=1656214103099"]]
+
+                  const colors = ["#1818b3", "#fb69c3", "#4cdcd5", "#b28dfb", "#1a95b3"]
+                  let c = colors[Math.floor(Math.random() * colors.length)]
+
+                  let zPos = Math.random() * -30
+                  let xPos = Math.random() * 30
+
+                  if(Math.random() > .5) {
+                    xPos = xPos * -1
+                  }
+                  if(Math.random() > .5) {
+                    zPos = zPos * -1
+                  }
+
+                  var sceneEl = document.querySelector('a-scene');
+                  var entityEl = document.createElement('a-gltf-model');
+                  entityEl.setAttribute('material', 'color', 'white');
+                  console.log(rarityPos)
+                  console.log(models_rarity[rarityPos])
+                  entityEl.setAttribute('src', models_rarity[rarityPos][i%(models_rarity[rarityPos].length)]);
+                  entityEl.setAttribute('position', {x:xPos, y:-10, z:zPos + i});
+                  entityEl.setAttribute('scale', {x:treesize, y:treesize, z:treesize});
+                  entityEl.setAttribute('shadow', {receive:true});
+
+                  var lightEl = document.createElement('a-entity');
+                  lightEl.setAttribute('position', {x:xPos, y:-8, z:zPos});
+                  lightEl.setAttribute('light', {type:"point", color: c, castShadow: true});
+
+                  sceneEl.appendChild(entityEl);
+                  sceneEl.appendChild(lightEl);
+                }
+              })
+           }
+      });
+
+
+      AFRAME.registerComponent("lightfix", {
+        init: function() {
+          this.el.addEventListener("model-loaded", e => {
+            console.log(e);
+            let model = this.el.getObject3D("mesh");
+            const colors = ["#1818b3", "#fb69c3", "#4cdcd5", "#b28dfb", "#1a95b3"]
+            let c = colors[Math.floor(Math.random() * colors.length)]
+
+            model.traverse(function(node) {
+              if (!node.material) return;
+
+              var tmp = node.material
+              node.material = new THREE.MeshStandardMaterial({
+                skinning: true,
+                map: node.material.map,
+                color: c
+              });
+              node.material.needsUpdate = true;
+              tmp.dispose()
+            });
+          });
+        }
+      });
+
+    </script>
+
+    <script>
+      AFRAME.registerShader('cutout', {
+        update: function (oldData) {
+          this.material.blending = THREE.NoBlending;
+          this.material.transparent = false;
+          this.material.colorWrite = false;
+          this.material.depthWrite = false;
+          this.material.depthTest = true;
+        },
+        fragmentShader: 'void main() { gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0); }'
+      });
+    </script>
+
+    <script>
+      AFRAME.registerGeometry('polygon', {
+        schema: {
+          stride: { default: 3 },
+          vertices: { default: [-1,1,0, -1,-1,0, 1,-1,0, 1,0.5,0] }
+        },
+
+        init: function (data) {
+          var geometry = new THREE.Geometry();
+          var i;
+          for (i = 0; (i+2) < data.vertices.length; i += data.stride) {
+            geometry.vertices.push(new THREE.Vector3(data.vertices[i], data.vertices[i+1], data.vertices[i+2]));
+          }
+          geometry.computeBoundingBox();
+          // generate faces - this makes a triangle fan, from the first +Y point around
+          for (i = 0; i < geometry.vertices.length - 2; i++)
+          {
+            geometry.faces.push(new THREE.Face3(0, i + 1, i + 2));
+          }
+          geometry.mergeVertices();
+          geometry.computeFaceNormals();
+          geometry.computeVertexNormals();
+          this.geometry = geometry;
+        }
+      });
+
+
+    </script>
+
+    <a-scene generatetrees embedded>
+
+      <!-- Without the sky, what we don't draw is punch-through -->
+      <a-sky rotation="0 -90 0" color="#000" opacity="0.7"></a-sky>
+
+      <!-- When we have a raycaster hit, we use this ball to show where. -->
+      <a-sphere id="ball" radius="0.01" position="0 0.005 -0.5"></a-sphere>
+
+
+        <!-- Declare a cursor, and what objects its raycaster hit (including AR). -->
+        <!-- NOTE: ar-raycaster VRHit uses a "tolerance" fudge factor, so imprecise -->
+        <!--       (and so may not want to use)                                     -->
+        <a-entity cursor="fuse:false"
+                  raycaster="objects:.plane;recursive:false"
+                  ar-raycaster="el:#ar-world"></a-entity>
+
+        <!-- Separate the cursor appearance.-->
+        <a-entity position="0 0 -0.1"
+                  scale="0.001 0.001 0.001"
+                  geometry="primitive: ring; radiusInner: 0.8; radiusOuter: 1"
+                  material="color: yellow; shader: flat; transparent:true"></a-entity>
+
+
+
+        <!-- Heads-up text display. -->
+        <!--<a-gltf-model src="https://cdn.glitch.global/6a09ec72-3ff6-4122-abc1-a728eaa0d8c1/fruit-tree%20(8).gltf?v=1656175911661" shadow="receive: true" position="0 -10 -9" scale=".3 .3 .3" lightfix></a-gltf-model>
+        <a-gltf-model src="https://cdn.glitch.global/6a09ec72-3ff6-4122-abc1-a728eaa0d8c1/fruit-tree%20(9).gltf?v=1656185199804"  shadow="receive: true" position="7 -10 -5" scale=".3 .3 .3" lightfix></a-gltf-model>
+        <a-gltf-model src="https://cdn.glitch.global/6a09ec72-3ff6-4122-abc1-a728eaa0d8c1/fruit-tree%20(10).gltf?v=1656185347911"  shadow="receive: true" position="-7 -10 -6" scale=".3 .3 .3" lightfix></a-gltf-model>
+        <a-gltf-model src="https://cdn.glitch.global/6a09ec72-3ff6-4122-abc1-a728eaa0d8c1/fruit-tree%20(11).gltf?v=1656185656356"  shadow="receive: true" position="-14 -10 -3" scale=".3 .3 .3" lightfix></a-gltf-model>
+        <a-gltf-model src="https://cdn.glitch.global/6a09ec72-3ff6-4122-abc1-a728eaa0d8c1/fruit-tree%20(12).gltf?v=1656185826620"  shadow="receive: true" position="10 -10 -3" scale=".3 .3 .3" lightfix></a-gltf-model>-->
+
+
+        <a-atoll-terrain position="0 -35 0" plateau-radius="50" middle-radius="1400" unit-size="4" far="4000"
+                     land-yin-color="#1818b3" land-yang-color="#b28dfb" sea-yin-color="#1818b3" sea-yang-color="#2571cf"
+                     sun-position="0.8 0.6 0" mean-elevation="30">
+        </a-atoll-terrain>
+
+
+        <a-plane position="0 -10 -4" rotation="-90 0 0" width="400" height="400" color="#c0fcfa" material="opacity:.8" shadow="receive: true"></a-plane>
+        <a-entity light="type: directional; color: #FFF; castShadow: true; intensity: 0.9" position="-1 0 0"></a-entity>
+        <a-entity light="type: directional; color: #FFF; castShadow: true; intensity: 0.9" position="-4 -5 -5"></a-entity>
+
+
+      <a-camera position="0 -9 0">
+
+      </a-camera>
+    </a-scene>
+
+    <script>
+      var sc = document.querySelector('a-scene');
+      function showHUD(msg) { sc.querySelector('#hud').setAttribute('value', msg); }
+
+      var raycasterUpdateNeeded = false;
+      var raycasterInterval;
+
+      function raycasterNeedsUpdate() {
+        raycasterUpdateNeeded = true;
+        if (!raycasterInterval) {
+          // NOTE: Assumes raycaster doesn't change.
+          var raycaster = sc.querySelector('[raycaster]').components.raycaster;
+          raycasterInterval = setInterval(function() {
+            if (raycasterUpdateNeeded) {
+              raycaster.refreshObjects();
+              raycasterUpdateNeeded = false;
+            }
+          }, raycaster.interval);
+        }
+      }
+
+      var tempMat4 = new THREE.Matrix4();
+      var tempScale = new THREE.Vector3(1, 1, 1);
+
+      function onAddedOrUpdatedPlanes(evt) {
+        evt.detail.anchors.forEach(function (anchor) {
+          var created = false;
+          var colorToUse;
+          var plane = sc.querySelector('#plane_' + anchor.identifier);
+          if (!plane) {
+            // Create and append the plane.
+            created = true;
+            colorToUse = randomColors[Math.floor(Math.random() * randomColors.length)];
+            plane = document.createElement('a-box');
+            plane.setAttribute('id', 'plane_' + anchor.identifier);
+            plane.setAttribute('class', 'plane');
+            plane.setAttribute('height', 0.001);
+
+            // Make the plane "cut a hole" in the skybox.
+            plane.setAttribute('material', 'shader:cutout;side:double');
+
+            sc.appendChild(plane);
+
+            plane.insertAdjacentHTML('beforeend',
+              // Add a plane label (which needs to be rotated to match a-box).
+              '<a-entity class="label" rotation="-90 0 0"></a-entity>' +
+              // Add bounding box.
+              '<a-box class="bbox" position="0 -0.04 0" height="0.01" material="wireframe:false;opacity:0.3;shader:grid;interval:0.1;color:' + colorToUse + '"></a-box>' +
+              // Add a thing to mark the center of the plane.
+              '<a-entity thing></a-entity>');
+
+            plane.tempPosition = new THREE.Vector3();
+            plane.tempQuaternion = new THREE.Quaternion();
+            plane.tempEuler = new THREE.Euler(0, 0, 0, 'YXZ');
+            plane.tempRotation = new THREE.Vector3();
+          } else {
+            colorToUse = plane.querySelector('.bbox').getAttribute('material', 'color');
+          }
+
+          // Update the plane.
+          var dx = anchor.extent[0];
+          var dz = anchor.extent[1];
+          tempMat4.fromArray(anchor.modelMatrix);
+          tempMat4.decompose(plane.tempPosition, plane.tempQuaternion, tempScale);
+          plane.tempEuler.setFromQuaternion(plane.tempQuaternion);
+          plane.tempRotation.set(
+            plane.tempEuler.x * THREE.Math.RAD2DEG,
+            plane.tempEuler.y * THREE.Math.RAD2DEG,
+            plane.tempEuler.z * THREE.Math.RAD2DEG);
+          plane.setAttribute('position', plane.tempPosition);
+          plane.setAttribute('rotation', plane.tempRotation);
+          // Currently, scale is always 1...
+          // plane.setAttribute('scale', evt.detail.scale);
+
+          // If we have vertices, use polygon geometry
+          if (anchor.vertices) {
+            // fails... perhaps it can't handle Float32Array?
+            //plane.setAttribute('geometry', {primitive:'polygon', vertices: evt.detail.vertices});
+            plane.setAttribute('geometry', 'primitive:polygon; vertices:' + anchor.vertices.join(','));
+          } else {
+            plane.setAttribute('geometry', 'primitive:box; width:' + dx +
+                                           '; height:0.001; depth:' + dz);
+          }
+
+          // Update the bounding box.
+          var bbox = plane.querySelector('.bbox');
+          bbox.setAttribute('width', dx);
+          bbox.setAttribute('depth', dz);
+
+          // Fill out the plane label with informative text.
+          // DETAIL: when creating, getAttribute doesn't work this tick
+          plane.querySelector('.label').setAttribute('text', {
+           width: dx,
+           height: dz,
+           color: 'gray',
+           align: 'left',
+           zOffset: 0.01,
+           wrapCount: 100, value:
+            'id: ' + anchor.identifier
+          + '\nwidth: ' + dx
+          + '\ndepth: ' + dz
+          + '\nposition x: ' + plane.tempPosition.x
+          + '\nposition y: ' + plane.tempPosition.y
+          + '\nposition z: ' + plane.tempPosition.z
+          + '\nrotation x: ' + plane.tempRotation.x
+          + '\nrotation y: ' + plane.tempRotation.y
+          + '\nrotation z: ' + plane.tempRotation.z
+          // Currently, scale is always 1...
+          //+ '\nscale x: ' + plane.getAttribute('scale').x
+          //+ '\nscale y: ' + plane.getAttribute('scale').y
+          //+ '\nscale z: ' + plane.getAttribute('scale').z
+          });
+
+          // We updated the plane (or added it), so update the raycaster.
+          // Because there may be a DOM change, we need to wait a tick.
+          if (created) { setTimeout(raycasterNeedsUpdate); } else { raycasterNeedsUpdate(); }
+
+          return plane;
+        });
+      }
+
+      function onRemovedPlanes(evt) {
+        evt.detail.anchors.forEach(function (anchor) {
+          var plane = sc.querySelector('#plane_' + anchor.identifier);
+          if (plane && plane.parentElement) {
+            plane.parentElement.removeChild(plane);
+          }
+        });
+      }
+
+      function addPlaneListeners() {
+        sc.addEventListener('anchorsadded', onAddedOrUpdatedPlanes);
+        sc.addEventListener('anchorsupdated', onAddedOrUpdatedPlanes);
+        sc.addEventListener('anchorsremoved', onRemovedPlanes);
+      }
+
+      function addARRaycasterListeners() {
+        var raycaster = sc.querySelector('[ar-raycaster]');
+        // Note, -intersection is what the raycaster gets; the hit object gets -intersected.
+        raycaster.addEventListener('raycaster-intersection', function (evt) {
+          // Use first hit (which should be nearest).
+          var point = evt.detail.intersections[0].point;
+          var distance = evt.detail.intersections[0].distance;
+          var el = evt.detail.els[0];
+          showHUD('raycaster-intersection ' + distance + '\n' + JSON.stringify(point) + '\n' + el.id);
+          if (el.getAttribute('class') === 'plane') { el.querySelector('.bbox').setAttribute('opacity', 0.7); }
+          ball.setAttribute('position', point);
+          ball.setAttribute('visible', true);
+        });
+        raycaster.addEventListener('raycaster-intersection-cleared', function (evt) {
+          var el = evt.detail.el;
+          showHUD('raycaster-intersection-cleared\n' + el.outerHTML);
+          if (el.getAttribute('class') === 'plane') { el.querySelector('.bbox').setAttribute('opacity', 0.3); }
+          ball.setAttribute('visible', false);
+        });
+      }
+
+      function addEventListeners() {
+        addARRaycasterListeners();
+        addPlaneListeners();
+      }
+
+
+
+      function goMetalNoise() {
+// This is the JSON for the shader we want to use.
+// Really, we should load this from somewhere.
+// See http://shaderfrog.com/app/view/{id}
+var importedShaderJSON = String.raw`
+{
+  "id": 293,
+  "name": "Metal Noise",
+  "fragment": "precision highp float;\nprecision highp int;\n\n// (sqrt(5) - 1)/4 = F4, used once below\n#define F4 0.309016994374947451\n#define PI 3.14159\n\nuniform float time;\nuniform float permutations;\nuniform float iterations;\nuniform vec2 uvScale;\nuniform vec3 color1;\nuniform vec3 color2;\nuniform vec3 color3;\nuniform float brightness;\nuniform float speed;\n\nvarying vec2 vUv;\n\n// Description : Array and textureless GLSL 2D/3D/4D simplex\n//               noise functions.\n//      Author : Ian McEwan, Ashima Arts.\n//  Maintainer : ijm\n//     Lastmod : 20110822 (ijm)\n//     License : Copyright (C) 2011 Ashima Arts. All rights reserved.\n//               Distributed under the MIT License. See LICENSE file.\n//               https://github.com/ashima/webgl-noise\n//\n\nvec4 mod289(vec4 x) {\n    return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\n\nfloat mod289(float x) {\n    return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\n\nvec4 permute(vec4 x) {\n    return mod289(((x*34.0)+1.0)*x);\n}\n\nfloat permute(float x) {\n    return mod289(((x*34.0)+1.0)*x);\n}\n\nvec4 taylorInvSqrt(vec4 r) {\n    return 1.79284291400159 - 0.85373472095314 * r;\n}\n\nfloat taylorInvSqrt(float r) {\n    return 1.79284291400159 - 0.85373472095314 * r;\n}\n\nvec4 grad4(float j, vec4 ip) {\n    const vec4 ones = vec4(1.0, 1.0, 1.0, -1.0);\n    vec4 p,s;\n\n    p.xyz = floor( fract (vec3(j) * ip.xyz) * 7.0) * ip.z - 1.0;\n    p.w = 1.5 - dot(abs(p.xyz), ones.xyz);\n    s = vec4(lessThan(p, vec4(0.0)));\n    p.xyz = p.xyz + (s.xyz*2.0 - 1.0) * s.www;\n\n    return p;\n}\n\nfloat snoise(vec4 v) {\n    const vec4  C = vec4( 0.138196601125011,  // (5 - sqrt(5))/20  G4\n            0.276393202250021,  // 2 * G4\n            0.414589803375032,  // 3 * G4\n            -0.447213595499958); // -1 + 4 * G4\n\n    // First corner\n    vec4 i  = floor(v + dot(v, vec4(F4)) );\n    vec4 x0 = v -   i + dot(i, C.xxxx);\n\n    // Other corners\n\n    // Rank sorting originally contributed by Bill Licea-Kane, AMD (formerly ATI)\n    vec4 i0;\n    vec3 isX = step( x0.yzw, x0.xxx );\n    vec3 isYZ = step( x0.zww, x0.yyz );\n    //  i0.x = dot( isX, vec3( 1.0 ) );\n    i0.x = isX.x + isX.y + isX.z;\n    i0.yzw = 1.0 - isX;\n    //  i0.y += dot( isYZ.xy, vec2( 1.0 ) );\n    i0.y += isYZ.x + isYZ.y;\n    i0.zw += 1.0 - isYZ.xy;\n    i0.z += isYZ.z;\n    i0.w += 1.0 - isYZ.z;\n\n    // i0 now contains the unique values 0,1,2,3 in each channel\n    vec4 i3 = clamp( i0, 0.0, 1.0 );\n    vec4 i2 = clamp( i0-1.0, 0.0, 1.0 );\n    vec4 i1 = clamp( i0-2.0, 0.0, 1.0 );\n\n    //  x0 = x0 - 0.0 + 0.0 * C.xxxx\n    //  x1 = x0 - i1  + 1.0 * C.xxxx\n    //  x2 = x0 - i2  + 2.0 * C.xxxx\n    //  x3 = x0 - i3  + 3.0 * C.xxxx\n    //  x4 = x0 - 1.0 + 4.0 * C.xxxx\n    vec4 x1 = x0 - i1 + C.xxxx;\n    vec4 x2 = x0 - i2 + C.yyyy;\n    vec4 x3 = x0 - i3 + C.zzzz;\n    vec4 x4 = x0 + C.wwww;\n\n    // Permutations\n    i = mod289(i);\n    float j0 = permute( permute( permute( permute(i.w) + i.z) + i.y) + i.x);\n    vec4 j1 = permute( permute( permute( permute (\n                        i.w + vec4(i1.w, i2.w, i3.w, 1.0 ))\n                    + i.z + vec4(i1.z, i2.z, i3.z, 1.0 ))\n                + i.y + vec4(i1.y, i2.y, i3.y, 1.0 ))\n            + i.x + vec4(i1.x, i2.x, i3.x, 1.0 ));\n\n    // Gradients: 7x7x6 points over a cube, mapped onto a 4-cross polytope\n    // 7*7*6 = 294, which is close to the ring size 17*17 = 289.\n    vec4 ip = vec4(1.0/294.0, 1.0/49.0, 1.0/7.0, 0.0) ;\n\n    vec4 p0 = grad4(j0,   ip);\n    vec4 p1 = grad4(j1.x, ip);\n    vec4 p2 = grad4(j1.y, ip);\n    vec4 p3 = grad4(j1.z, ip);\n    vec4 p4 = grad4(j1.w, ip);\n\n    // Normalise gradients\n    vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));\n    p0 *= norm.x;\n    p1 *= norm.y;\n    p2 *= norm.z;\n    p3 *= norm.w;\n    p4 *= taylorInvSqrt(dot(p4,p4));\n\n    // Mix contributions from the five corners\n    vec3 m0 = max(0.6 - vec3(dot(x0,x0), dot(x1,x1), dot(x2,x2)), 0.0);\n    vec2 m1 = max(0.6 - vec2(dot(x3,x3), dot(x4,x4)            ), 0.0);\n    m0 = m0 * m0;\n    m1 = m1 * m1;\n    return(\n        49.0 * ( dot(m0*m0, vec3( dot( p0, x0 ), dot( p1, x1 ), dot( p2, x2 )))\n            + dot(m1*m1, vec2( dot( p3, x3 ), dot( p4, x4 ) ) ) )\n    );\n\n}\n\n// makes a pseudorandom number between 0 and 1\nfloat hash(float n) {\n    return fract(sin(n)*93942.234);\n}\n\nfloat clampedNoise( vec4 p ) {\n    return clamp( 0.4 * 0.2 + snoise( p ), 0.0, 1.0 );\n}\n\n// rotation matrix\nmat2 m = mat2(0.6,0.8,-0.8,0.6);\n\n// fractional brownian motion (i.e. photoshop clouds)\nfloat fbm(vec4 p) {\n    float f = 0.0;\n    f += 0.5 * clampedNoise(vec4( p.xy * m, p.zw * m ));\n    p *= 2.02;\n    f += 0.25 * clampedNoise(vec4( p.xy * m, p.zw * m ));\n    p *= 2.01;\n    f += 0.125 * clampedNoise(vec4( p.xy * m, p.zw * m ));\n    p *= 2.03;\n    f += 0.0625 * clampedNoise(vec4( p.xy * m, p.zw * m ));\n    f /= 0.9375;\n    return f;\n}\n\nvoid main() {\n    // relative coordinates\n    vec2 p = vUv * uvScale;\n    float elapsed = time * speed * 0.01;\n\n    float s = vUv.x * uvScale.x;\n    float t = vUv.y * uvScale.y;\n\n    // Tiling 4d noise based on\n    // https://gamedev.stackexchange.com/questions/23625/how-do-you-generate-tileable-perlin-noise/23639#23639\n    float multiplier = iterations / ( 2.0 * PI );\n    float nx = cos( s * 2.0 * PI ) * multiplier;\n    float ny = cos( t * 2.0 * PI ) * multiplier;\n    float nz = sin( s * 2.0 * PI ) * multiplier;\n    float nw = sin( t * 2.0 * PI ) * multiplier;\n\n    vec4 tile4d = vec4( nx, ny, nz, nw );\n\n    vec2 a = vec2(\n        fbm( tile4d + elapsed * 1.1 ),\n        fbm( tile4d - elapsed * 1.3 )\n    );\n\n    vec2 b = vec2(\n        fbm( tile4d + elapsed * 1.2 + a.x * 2.0 ),\n        fbm( tile4d - elapsed * 1.2 + a.y * 3.0 )\n    );\n\n    float surf = fbm( tile4d + elapsed + length( b ) * permutations );\n\n    // mix in some color\n    vec3 colorOutput = brightness * (\n        ( ( b.x + surf ) * color1 ) +\n        ( ( b.y + surf ) * color2 ) +\n        ( ( surf + b.x ) * color3 )\n    );\n\n    gl_FragColor = vec4( colorOutput, 1.);\n}",
+  "vertex": "/**\n* Example Vertex Shader\n* Sets the position of the vertex by setting gl_Position\n*/\n\n// Set the precision for data types used in this shader\nprecision highp float;\nprecision highp int;\n\n// Default THREE.js uniforms available to both fragment and vertex shader\nuniform mat4 modelMatrix;\nuniform mat4 modelViewMatrix;\nuniform mat4 projectionMatrix;\nuniform mat4 viewMatrix;\nuniform mat3 normalMatrix;\n\n// Default uniforms provided by ShaderFrog.\nuniform vec3 cameraPosition;\nuniform float time;\n\n// Default attributes provided by THREE.js. Attributes are only available in the\n// vertex shader. You can pass them to the fragment shader using varyings\nattribute vec3 position;\nattribute vec3 normal;\nattribute vec2 uv;\nattribute vec2 uv2;\n\n// Examples of variables passed from vertex to fragment shader\nvarying vec3 vPosition;\nvarying vec3 vNormal;\nvarying vec2 vUv;\nvarying vec2 vUv2;\n\nvoid main() {\n\n    // To pass variables to the fragment shader, you assign them here in the\n    // main function. Traditionally you name the varying with vAttributeName\n    vNormal = normal;\n    vUv = uv;\n    vUv2 = uv2;\n    vPosition = position;\n\n    // This sets the position of the vertex in 3d space. The correct math is\n    // provided below to take into account camera and object data.\n    gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n\n}",
+  "uniforms": {
+    "cameraPosition": {
+      "name": "cameraPosition",
+      "type": "v3",
+      "glslType": "vec3",
+      "description": ""
+    },
+    "time": {
+      "name": "time",
+      "type": "f",
+      "glslType": "float",
+      "description": ""
+    },
+    "uvScale": {
+      "name": "uvScale",
+      "type": "v2",
+      "glslType": "vec2",
+      "value": {
+        "x": "1",
+        "y": "1"
+      },
+      "description": ""
+    },
+    "speed": {
+      "name": "speed",
+      "type": "f",
+      "glslType": "float",
+      "value": "1",
+      "description": ""
+    },
+    "color1": {
+      "name": null,
+      "type": "c",
+      "glslType": "vec3",
+      "value": {
+        "r": 0.7098039215686275,
+        "g": 0.3137254901960784,
+        "b": 0.8117647058823529
+      },
+      "description": ""
+    },
+    "color2": {
+      "name": null,
+      "type": "c",
+      "glslType": "vec3",
+      "value": {
+        "r": 0.12941176470588237,
+        "g": 0.24313725490196078,
+        "b": 0.9803921568627451
+      },
+      "description": ""
+    },
+    "color3": {
+      "name": null,
+      "type": "c",
+      "glslType": "vec3",
+      "value": {
+        "r": 0.8980392156862745,
+        "g": 0.3568627450980392,
+        "b": 0.8
+      },
+      "description": ""
+    },
+    "brightness": {
+      "name": null,
+      "type": "f",
+      "glslType": "float",
+      "value": "1",
+      "description": ""
+    },
+    "permutations": {
+      "name": null,
+      "type": "f",
+      "glslType": "float",
+      "value": "10",
+      "description": ""
+    },
+    "iterations": {
+      "name": null,
+      "type": "f",
+      "glslType": "float",
+      "value": "1",
+      "description": ""
+    }
+  },
+  "url": "http://shaderfrog.com/app/view/293",
+  "user": {
+    "username": "andrewray",
+    "url": "http://shaderfrog.com/app/profile/andrewray"
+  }
+}
+`;
+        // Import the shader.
+        // Note that this one has default values in the JSON.
+        AFRAME.utils.importShaderFrog(
+          "metalNoise", // shader name
+          importedShaderJSON,     // shader JSON string
+          {
+            uvScale: '2 2',
+            speed: 2,
+            color1: '0.7098039215686275 0.3137254901960784 0.8117647058823529',
+            color2: '0.12941176470588237 0.24313725490196078 0.9803921568627451',
+            color3: '0.8980392156862745 0.3568627450980392 0.8',
+            brightness: 1,
+            permutations: 8,
+            iterations: 1
+          }
+        );
+
+        // Apply the shader to scene entities.
+        document.querySelector('a-sky').setAttribute('material', {shader:'metalNoise'});
+      }
+
+
+
+
+      function goWarpspeed() {
+// This is the JSON for the shader we want to use.
+// Really, we should load this from somewhere.
+// See http://shaderfrog.com/app/view/{id}
+var importedShaderJSON = String.raw`
+{
+  "id": 708,
+  "name": "Transparent Warp Speed",
+  "fragment": "precision highp float;\n\nvarying vec2 vUv;\nuniform float time;\nuniform float speed;\nuniform float fadeAway;\nuniform vec3 color;\nuniform vec2 mouse;\nuniform vec2 resolution;\nuniform float uniformity;\n\nvoid main(void) {\n    float t = time * speed;\n    vec2 position = (vUv.xy - resolution.xy * .5) / resolution.x;\n    float angle = atan(position.y, position.x) / (2. * 3.14159265359);\n    angle -= floor(angle);\n    float rad = length(position);\n    float angleFract = fract(angle * 256.);\n    float angleRnd = floor(angle * 256.) + 1.;\n    float angleRnd1 = fract(angleRnd * fract(angleRnd * .7235) * 45.1);\n    float angleRnd2 = fract(angleRnd * fract(angleRnd * .82657) * 13.724);\n    float t2 = t + angleRnd1 * uniformity;\n    float radDist = sqrt(angleRnd2);\n    float adist = radDist / rad * .1;\n    float dist = (t2 * .1 + adist);\n    dist = abs(fract(dist) - fadeAway);\n    \n    float outputColor = (1.0 / (dist)) * cos(0.7 * sin(t)) * adist / radDist / 30.0;\n    angle = fract(angle + .61);\n    gl_FragColor = vec4(outputColor * color, outputColor);\n}\n",
+  "vertex": "/**\n* Example Vertex Shader\n* Sets the position of the vertex by setting gl_Position\n*/\n\n// Set the precision for data types used in this shader\nprecision highp float;\nprecision highp int;\n\n// Default THREE.js uniforms available to both fragment and vertex shader\nuniform mat4 modelMatrix;\nuniform mat4 modelViewMatrix;\nuniform mat4 projectionMatrix;\nuniform mat4 viewMatrix;\nuniform mat3 normalMatrix;\n\n// Default uniforms provided by ShaderFrog.\nuniform vec3 cameraPosition;\nuniform float time;\n\n// Default attributes provided by THREE.js. Attributes are only available in the\n// vertex shader. You can pass them to the fragment shader using varyings\nattribute vec3 position;\nattribute vec3 normal;\nattribute vec2 uv;\nattribute vec2 uv2;\n\n// Examples of variables passed from vertex to fragment shader\nvarying vec3 vPosition;\nvarying vec3 vNormal;\nvarying vec2 vUv;\nvarying vec2 vUv2;\n\nvoid main() {\n\n    // To pass variables to the fragment shader, you assign them here in the\n    // main function. Traditionally you name the varying with vAttributeName\n    vNormal = normal;\n    vUv = uv;\n    vUv2 = uv2;\n    vPosition = position;\n\n    // This sets the position of the vertex in 3d space. The correct math is\n    // provided below to take into account camera and object data.\n    gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n\n}",
+  "uniforms": {
+    "cameraPosition": {
+      "name": "cameraPosition",
+      "displayName": null,
+      "type": "v3",
+      "glslType": "vec3",
+      "useGridHelper": false,
+      "useRange": false,
+      "range": null,
+      "isRandom": false,
+      "randomRange": null,
+      "useToggle": false,
+      "toggle": null,
+      "description": ""
+    },
+    "time": {
+      "name": "time",
+      "displayName": null,
+      "type": "f",
+      "glslType": "float",
+      "useGridHelper": false,
+      "useRange": false,
+      "range": null,
+      "isRandom": false,
+      "randomRange": null,
+      "useToggle": false,
+      "toggle": null,
+      "description": ""
+    },
+    "mouse": {
+      "name": "mouse",
+      "displayName": null,
+      "type": "v2",
+      "glslType": "vec2",
+      "useGridHelper": false,
+      "useRange": false,
+      "range": null,
+      "isRandom": false,
+      "randomRange": null,
+      "useToggle": false,
+      "toggle": null,
+      "description": ""
+    },
+    "resolution": {
+      "name": "resolution",
+      "displayName": null,
+      "type": "v2",
+      "glslType": "vec2",
+      "useGridHelper": false,
+      "useRange": false,
+      "range": null,
+      "isRandom": false,
+      "randomRange": null,
+      "useToggle": false,
+      "toggle": null,
+      "description": ""
+    },
+    "speed": {
+      "name": "speed",
+      "displayName": null,
+      "type": "f",
+      "glslType": "float",
+      "useGridHelper": false,
+      "useRange": false,
+      "range": null,
+      "isRandom": false,
+      "randomRange": null,
+      "useToggle": false,
+      "toggle": null,
+      "description": ""
+    },
+    "color": {
+      "name": "color",
+      "displayName": null,
+      "type": "c",
+      "glslType": "vec3",
+      "useGridHelper": false,
+      "useRange": false,
+      "range": null,
+      "isRandom": false,
+      "randomRange": null,
+      "useToggle": false,
+      "toggle": null,
+      "description": ""
+    },
+    "fadeAway": {
+      "name": "fadeAway",
+      "displayName": null,
+      "type": "f",
+      "glslType": "float",
+      "useGridHelper": false,
+      "useRange": false,
+      "range": null,
+      "isRandom": false,
+      "randomRange": null,
+      "useToggle": false,
+      "toggle": null,
+      "description": ""
+    },
+    "uniformity": {
+      "name": "uniformity",
+      "displayName": null,
+      "type": "f",
+      "glslType": "float",
+      "useGridHelper": false,
+      "useRange": false,
+      "range": null,
+      "isRandom": false,
+      "randomRange": null,
+      "useToggle": false,
+      "toggle": null,
+      "description": ""
+    }
+  },
+  "url": "http://shaderfrog.com/app/view/708",
+  "user": {
+    "username": "andrewray",
+    "url": "http://shaderfrog.com/app/profile/andrewray"
+  }
+}
+`;
+        // Import the shader.
+        // Note that this one has default values in the JSON.
+        AFRAME.utils.importShaderFrog(
+          "transparentWarpSpeed", // shader name
+          importedShaderJSON,     // shader JSON string
+          {
+            resolution: {x:1, y:1},
+            speed: 8,
+            fadeAway: 0.7,
+            uniformity: 5
+          }
+        );
+
+        // Apply the shader to scene entities.
+        document.querySelector('a-sky').setAttribute('material', {shader:'transparentWarpSpeed', color:'#da00fd'});
+      }
+
+      function onSceneLoaded() {
+
+        goMetalNoise();
+      }
+
+      if (sc.hasLoaded) { onSceneLoaded(); }
+      else { sc.addEventListener('loaded', onSceneLoaded); }
+    </script>
+  </body>
+</html>
