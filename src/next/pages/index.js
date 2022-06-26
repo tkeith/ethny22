@@ -1,6 +1,5 @@
 import Frame from '../components/Frame.js';
 import { TextButton, SubmitButton, TextInput } from '../components/examples/misc.js';
-import { address, abi } from '../../lib/contract.js';
 import { utils, BigNumber } from 'ethers';
 import { Contract } from '@ethersproject/contracts';
 import { useCall, useContractFunction } from '@usedapp/core';
@@ -13,10 +12,10 @@ import { Dialog, Transition } from '@headlessui/react'
 import { CheckIcon } from '@heroicons/react/outline'
 // import getMongo from '../../lib/mongo.js';
 
-const contract = new Contract(address, new utils.Interface(abi));
 
-
-export default function Trees({ address, abi }) {
+export default function Trees({ address, abi, chainId, rpcUrl }) {
+  const contract = new Contract(address, new utils.Interface(abi));
+  // const contract = new Contract(address, abi)
 
   //////////////////////////////
   // MINTING COST INFO
@@ -41,7 +40,6 @@ export default function Trees({ address, abi }) {
   //////////////////////////////
   // TREE MINTING
 
-  const contract = new Contract(address, abi)
 
   const plantHook = useContractFunction(contract, 'plantSeed', { transactionName: 'PlantSeed' })
 
@@ -120,7 +118,7 @@ export default function Trees({ address, abi }) {
   // PAGE
 
   return <>
-    <Frame title='Trees' accountRequired>
+    <Frame title='Trees' accountRequired chainId={chainId} rpcUrl={rpcUrl}>
       <p>Cost to plant a new seed: {mintCost / 1e18} ETH</p>
       <TextButton onClick={() => doMint()}>Plant a new seed</TextButton>
 
@@ -215,6 +213,7 @@ export default function Trees({ address, abi }) {
 }
 
 export async function getServerSideProps() {
+  var contractModule = await import('../../lib/contract.js');
   // const mongo = await getMongo()
   // const myTrees = await mongo.collection('trees').find({  })
 
@@ -222,8 +221,10 @@ export async function getServerSideProps() {
 
   return {
     props: {
-      address: address,
-      abi: abi,
+      address: contractModule.address,
+      abi: contractModule.abi,
+      chainId: contractModule.chainId,
+      rpcUrl: contractModule.rpcUrl
       // myTrees: myTrees,
     }
   }

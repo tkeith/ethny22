@@ -33,7 +33,6 @@ import { useEtherBalance, useEthers } from '@usedapp/core'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { formatEther } from '@ethersproject/units'
 import { TextButton } from '../components/examples/misc.js'
-import { chainId, rpcUrl } from '../../lib/contract.js'
 
 const navigation = [
   { name: 'Explore', href: '/explore', icon: HomeIcon },
@@ -44,7 +43,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function Frame({ children, title, accountRequired }) {
+export default function Frame({ children, title, accountRequired, chainId, rpcUrl }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const { activate, activateBrowserWallet, account } = useEthers()
@@ -229,3 +228,15 @@ export default function Frame({ children, title, accountRequired }) {
     </>
   )
 }
+
+// import { chainId, rpcUrl } from '../../lib/contract.js'
+
+// export async function getServerSideProps() {
+
+//   return {
+//     props: {
+//       rpcUrl: rpcUrl,
+//       chainId: chainId,
+//     }
+//   }
+// }
