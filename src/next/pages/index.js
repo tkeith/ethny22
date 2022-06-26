@@ -36,7 +36,7 @@ export default function Trees({ address, abi }) {
 
     getCurrentMintCost()
 
-  }, [])
+  }, [abi, address])
 
   //////////////////////////////
   // TREE MINTING
