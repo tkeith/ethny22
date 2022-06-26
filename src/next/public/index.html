@@ -44,7 +44,7 @@
     <script>
       AFRAME.registerComponent("generatetrees", {
         update: function() {
-              fetch("https://tk.co/express/treeSample")
+              fetch("/express/trees")
               .then((response) => response.json())
               .then((treeData) => {
                 console.log(treeData)

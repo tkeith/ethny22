@@ -11,7 +11,8 @@ export default function Explore() {
       <script src="main.js"></script>
 
       <div id="para" className="glitch-embed-wrap">
-        <iframe id="glitch" src="https://glitch.com/embed/#!/embed/generative-trees?path=index.html&previewSize=100"></iframe>
+        {/* <iframe id="glitch" src="https://glitch.com/embed/#!/embed/generative-trees?path=index.html&previewSize=100"></iframe> */}
+        <iframe id="glitch" src="/index.html"></iframe>
       </div>
     </Frame>
   </>
