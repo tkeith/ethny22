@@ -106,6 +106,7 @@ contract ChubbyGrubbies is ERC721 {
 
   function _afterTokenTransfer(address /* from */, address to, uint256 tokenId) internal override {
     owners[tokenId].push(Owner(block.timestamp, to));
+    _emitTreeChange(tokenId);
   }
 
   // function tokenURI(uint256 tokenId) override public view returns(string memory) {

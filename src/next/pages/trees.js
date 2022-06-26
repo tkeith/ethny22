@@ -28,7 +28,6 @@ export default function Trees({ address, abi }) {
     async function getCurrentMintCost() {
       const mmWeb3 = new Web3(window.ethereum);
       const contract = new mmWeb3.eth.Contract(abi, address)
-      console.log("Calling allowance: ")
       await contract.methods.getCurrentMintCost().call(function (error, result) {
         console.log("Current mint cost: ", result)
         setMintCost(result)
@@ -98,6 +97,22 @@ export default function Trees({ address, abi }) {
     growHook.send(modalTree.tokenId, { value: amount })
 
     setWaterSuccess(true);
+
+  }
+
+  //////////////////////////////
+  // SEND TREE
+
+  const sendHook = useContractFunction(contract, 'transferFrom', { transactionName: 'Send' })
+
+  async function sendTree(event) {
+    event.preventDefault()
+
+    const recip = event.target.recip.value;
+
+    sendHook.send(account, recip, modalTree.tokenId)
+
+    // setSendSuccess(true);
 
   }
 
@@ -172,6 +187,11 @@ export default function Trees({ address, abi }) {
                     <form onSubmit={waterTree} className='w-full flex flex-col items-center my-4'>
                       <TextInput name='amount' placeholder='Amount of ETH' />
                       <button type="submit" className="inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm">Water tree</button>
+                      {/* {waterSuccess && <p className="ml-2 text-xs inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-green-500 text-white rounded">The tree has been watered, watch it grow!</p>} */}
+                    </form>
+                    <form onSubmit={sendTree} className='w-full flex flex-col items-center my-4'>
+                      <TextInput name='recip' placeholder='Recipient address' />
+                      <button type="submit" className="inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm">Send tree</button>
                       {/* {waterSuccess && <p className="ml-2 text-xs inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-green-500 text-white rounded">The tree has been watered, watch it grow!</p>} */}
                     </form>
                   </div>
