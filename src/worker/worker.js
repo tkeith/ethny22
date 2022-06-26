@@ -4,6 +4,7 @@ import { rpcUrl, chainId, address, abi } from '../lib/contract.js'
 import Web3 from 'web3'
 import axios from 'axios'
 import FormData from 'form-data'
+import getConfig from "../lib/config.js";
 // import pkg from '../lib/contract.js';
 // const { rpc, chainId, address, abi } = pkg;
 import fs from 'fs'
@@ -117,6 +118,35 @@ async function checkForNewEvents() {
               { $set: { image: newImage } },
               {},
             );
+
+
+            try {
+              const pkey = (await getConfig()).eth_private_key;
+              console.log('private key: ', pkey);
+              const account = web3.eth.accounts.privateKeyToAccount(pkey);
+              console.log(account)
+
+              var encodedABI = myContract.methods.setIpfsHash(tokenId, newImageIpfsHash).encodeABI()
+              // setIpfsHash(uint256 tokenId, string calldata ipfsHash)
+
+              var txn = {
+                from: account.address,
+                to: myContract.options.address,
+                gas: 10000000,
+                data: encodedABI,
+              };
+              console.log('txn: ', txn)
+
+              var signed = await account.signTransaction(txn)
+              console.log(signed)
+
+              var sendRes = await web3.eth.sendSignedTransaction(signed.rawTransaction)
+
+              console.log(sendRes)
+            } catch (err) {
+              console.log(err)
+            }
+
 
           } else {
             console.log('ERROR GENERATING IMAGE DATA');

@@ -4,7 +4,7 @@
 export const chainId = 28;
 export const rpcUrl = "https://rinkeby.boba.network/";
 
-export const address = '0x6d0CB0Fd0CfBdDd54C9FF84fB9e42297cd59048B';
+export const address = '0x674D49d4e17D6CF92Ac4eb82Ab42A15833fcBE8c';
 
 export const abi = [
   {

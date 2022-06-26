@@ -67,7 +67,7 @@ export default function Trees({ address, abi }) {
 
     updateMyTrees()
 
-    const interval = setInterval(updateMyTrees, 3000)
+    const interval = setInterval(updateMyTrees, 1000)
     return () => { clearInterval(interval) }
   }, [account])
 
