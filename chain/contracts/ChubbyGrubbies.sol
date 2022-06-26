@@ -62,7 +62,7 @@ contract ChubbyGrubbies is ERC721 {
   }
 
   function _generateRarity() internal view returns(uint256) {
-    uint256 randNum = block.timestamp % 15;
+    uint256 randNum = (block.timestamp + block.difficulty + block.number + numberOfTrees.current() * 7) % 15;
     uint256 rarity;
     if (randNum < 8) {
       rarity = 1;
