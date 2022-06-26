@@ -8,14 +8,15 @@ require("@nomiclabs/hardhat-waffle");
  */
 module.exports = {
   solidity: "0.8.15",
-  defaultNetwork: "matic",
+  defaultNetwork: "optimism",
   networks: {
-    matic: {
-      url: "https://polygon-rpc.com/",
-      accounts: [process.env.PRIVATE_KEY]
+    optimism: {
+      url: "https://mainnet.optimism.io/",
+      accounts: [process.env.PRIVATE_KEY],
+      chainId: 10
     }
   },
-  etherscan: {
-    apiKey: process.env.POLYGONSCAN_API_KEY
-  }
+  // etherscan: {
+  //   apiKey: process.env.POLYGONSCAN_API_KEY
+  // }
 };
