@@ -61,8 +61,19 @@ contract ChubbyGrubbies is ERC721 {
     );
   }
 
-  function _generateRarity() internal returns(uint256) {
-    return block.timestamp % 5 + 1; // TODO randomly choose 1-5
+  function _generateRarity() internal view returns(uint256) {
+    uint256 randNum = (block.timestamp + block.difficulty + block.number + numberOfTrees.current() * 7) % 15;
+    uint256 rarity;
+    if (randNum < 8) {
+      rarity = 1;
+    } else if (randNum < 8 + 4) {
+      rarity = 2;
+    } else if (randNum < 8 + 4 + 2) {
+      rarity = 3;
+    } else {
+      rarity = 4;
+    }
+    return rarity;
   }
 
   function isTree(uint256 tokenId) public view returns(bool) {
@@ -95,6 +106,15 @@ contract ChubbyGrubbies is ERC721 {
 
   function _afterTokenTransfer(address /* from */, address to, uint256 tokenId) internal override {
     owners[tokenId].push(Owner(block.timestamp, to));
+    _emitTreeChange(tokenId);
+  }
+
+  // function tokenURI(uint256 tokenId) override public view returns(string memory) {
+  //   require(isTree(tokenId), "Invalid token ID");
+  //   return "https://demo.storj-ipfs.com/ipfs/" + ipfsHashes[tokenId];
+  // }
+  function _baseURI() override internal pure returns(string memory) {
+    return "https://demo.storj-ipfs.com/ipfs/";
   }
 
   function _emitTreeChange(uint256 tokenId) internal {

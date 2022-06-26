@@ -47,18 +47,20 @@ function classNames(...classes) {
 export default function Frame({ children, title, accountRequired }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  const { activateBrowserWallet, account } = useEthers()
+  const { activate, activateBrowserWallet, account } = useEthers()
   const etherBalance = useEtherBalance(account)
 
+  var rpcDict = {};
+  rpcDict[chainId] = rpcUrl;
+
+  const wcProvider = new WalletConnectProvider({
+    // infuraId: SOME_LONG_API_ID,
+    rpc: rpcDict
+  });
+
   const connectWithWalletConnect = async () => {
-    const provider = new WalletConnectProvider({
-      // infuraId: SOME_LONG_API_ID,
-      rpc: {
-        chainId: rpcUrl
-      },
-    });
-    await provider.enable();
-    activateBrowserWallet(provider);
+    await wcProvider.enable();
+    activate(wcProvider);
   }
 
   return (

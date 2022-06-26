@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/tk/x/ethny22/chain/contracts/ChubbyGrubbies.sol": {
-      "lastModificationDate": 1656191943935,
-      "contentHash": "407b323232aa6e7daf7483bb7ed41ba2",
+      "lastModificationDate": 1656215827039,
+      "contentHash": "10129e04086308b1da8b4ed7aaae68d0",
       "sourceName": "contracts/ChubbyGrubbies.sol",
       "solcConfig": {
         "version": "0.8.15",

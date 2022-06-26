@@ -1,0 +1,19 @@
+<svg
+    width="1000"
+    height="1000"
+    >
+
+        <rect
+            width="500"
+            height="500"
+            x="100"
+            y="100"
+            fill="black"
+        />
+
+        <polygon
+            fill="white"
+            points="100,50 400,100 320,200 80,230"
+        />
+
+    </svg>

@@ -10,7 +10,7 @@ export default function Explore() {
       <script src="ccapture/build/CCapture.all.min.js"></script>
       <script src="main.js"></script>
 
-      <div id="para" class="glitch-embed-wrap">
+      <div id="para" className="glitch-embed-wrap">
         <iframe id="glitch" src="https://glitch.com/embed/#!/embed/generative-trees?path=index.html&previewSize=100"></iframe>
       </div>
     </Frame>
