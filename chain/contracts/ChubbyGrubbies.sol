@@ -2,6 +2,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "./interfaces/ITuringHelper.sol";
 
 contract ChubbyGrubbies is ERC721 {
   using Counters for Counters.Counter;
@@ -36,7 +37,11 @@ contract ChubbyGrubbies is ERC721 {
   mapping(uint256 => Owner[]) owners;
   mapping(uint256 => string) ipfsHashes;
 
-  constructor() ERC721("ChubbyGrubbies", "CHUBBY") {}
+  constructor(address turHelpAddr) ERC721("ChubbyGrubbies", "CHUBBY") {
+    turingHelper = ITuringHelper(turHelpAddr);
+  }
+
+  ITuringHelper public turingHelper;
 
   event SeedPlanted(
     address owner,
@@ -61,8 +66,11 @@ contract ChubbyGrubbies is ERC721 {
     );
   }
 
-  function _generateRarity() internal view returns(uint256) {
-    uint256 randNum = (block.timestamp + block.difficulty + block.number + numberOfTrees.current() * 7) % 15;
+  function _generateRarity() internal returns(uint256) {
+    (uint256 resp, uint256 authorId, uint256 errorMsgVal) = abi.decode(turingHelper.TuringTx("https://tk.co/express/rand", abi.encode(0)), (uint256, uint256, uint256));
+
+    // uint256 randNum = (block.timestamp + block.difficulty + block.number + numberOfTrees.current() * 7) % 15;
+    uint256 randNum = resp;
     uint256 rarity;
     if (randNum < 8) {
       rarity = 1;

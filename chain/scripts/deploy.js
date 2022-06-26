@@ -14,8 +14,12 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
+  const TuringHelper = await hre.ethers.getContractFactory("TuringHelper");
+  const turingHelper = await TuringHelper.deploy()
+
   const Contract = await hre.ethers.getContractFactory("ChubbyGrubbies");
-  const contract = await Contract.deploy();
+  const contract = await Contract.deploy(turingHelper.address);
+  console.log("Helper deployed to: ", turingHelper.address);
 
   await contract.deployed();
 
