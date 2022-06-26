@@ -2,8 +2,11 @@ import { getWorker } from "../lib/bullmq.js";
 import getMongo from "../lib/mongo.js";
 import { rpcUrl, chainId, address, abi } from '../lib/contract.js'
 import Web3 from 'web3'
+import axios from 'axios'
+import FormData from 'form-data'
 // import pkg from '../lib/contract.js';
 // const { rpc, chainId, address, abi } = pkg;
+import fs from 'fs'
 
 getWorker('exampleSaveTextQueue', async job => {
   const newText = job.data.newText;
@@ -53,23 +56,34 @@ async function checkForNewEvents() {
       owners.push(item.owner)
     }
 
+    const numOwners = owners.length;
+
     const ownerHistory = JSON.stringify(event.returnValues.owners);
     const ownerHistoryHash = hash(ownerHistory);
+    const ownerHistoryHashHex = ownerHistoryHash.toString(16);
 
-    const updateRes = await db.collection('trees').updateOne(
-      { tokenId: tokenId },
-      { $set: { rarity: rarity, size: size, owners: owners, currentOwner: owners[owners.length - 1], ownerHistoryHash: ownerHistoryHash, ownerHistoryHashHex: ownerHistoryHash.toString(16) } },
-      { upsert: true },
+    const current = await db.collection('trees').findOne(
+      { tokenId: tokenId }
     )
-    console.log(updateRes);
-    if (updateRes.modifiedCount > 0 || updateRes.upsertedCount > 0) {
+    if ((!current) || current.size < size || current.numOwners < numOwners) {
+      // some change happened
+      console.log('CHANGE, UPDATING')
+      console.log(current)
+      console.log({ size: size, numOwners: numOwners })
 
-      // some change was made
+      const updateRes = await db.collection('trees').updateOne(
+        { tokenId: tokenId },
+        { $set: { rarity: rarity, size: size, owners: owners, numOwners: numOwners, currentOwner: owners[owners.length - 1], ownerHistoryHash: ownerHistoryHash, ownerHistoryHashHex: ownerHistoryHashHex } },
+        { upsert: true },
+      )
+      console.log(updateRes);
+
       let image;
       if (rarity == 0) {
         image = "https://demo.storj-ipfs.com/ipfs/QmQo2tQZaQujodPRYQGmYFC6umNhsEwqEsx4mZpPn8uLkc";
       } else {
         image = "https://demo.storj-ipfs.com/ipfs/QmcZTSMUMvFftMqqUBFy5jVyEXgAGmRSt2X8LqGLBc5QPU";
+        // set image to pending image
       }
       const updateImageRes = await db.collection('trees').updateOne(
         { tokenId: tokenId },
@@ -78,9 +92,49 @@ async function checkForNewEvents() {
       );
       console.log(updateImageRes);
 
+      if (rarity > 0) {
+        // if rarity is zero, it's still an acorn. only need to generate an image if > 0
+
+        (async () => {
+          var imageData;
+
+          imageData = await generateImage({ tokenId, rarity, size, owners, ownerHistoryHash, ownerHistoryHashHex });
+
+          if (imageData) {
+            var formData = new FormData();
+            formData.append("image", imageData);
+
+            const newImageIpfsHash = (await axios.post('https://demo.storj-ipfs.com/api/v0/add', formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            })).data.Hash;
+
+            const newImage = "https://demo.storj-ipfs.com/ipfs/" + newImageIpfsHash;
+
+            const updateImageRes = await db.collection('trees').updateOne(
+              { tokenId: tokenId },
+              { $set: { image: newImage } },
+              {},
+            );
+
+          } else {
+            console.log('ERROR GENERATING IMAGE DATA');
+          }
+
+        })();
+
+      }
     }
   }
 }
 
 checkForNewEvents()
 setInterval(checkForNewEvents, 10000)
+
+async function generateImage({ tokenId, rarity, size, owners, ownerHistoryHash, ownerHistoryHashHex }) {
+
+  const data = await fs.promises.readFile(`../tree-images/tree-${rarity}.gif`);
+  return data
+
+}

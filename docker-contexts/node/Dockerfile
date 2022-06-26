@@ -7,3 +7,4 @@ WORKDIR /opt/app
 
 # RUN npm install
 # this is now handled at runtime by installing into a shared volume
+# RUN apt-get update && apt-get install --yes build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev && apt-get clean && rm -rf /tmp/* /var/tmp/* /var/lib/apt/archive/* /var/lib/apt/lists/*
