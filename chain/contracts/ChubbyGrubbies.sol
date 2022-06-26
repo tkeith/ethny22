@@ -27,7 +27,7 @@ contract ChubbyGrubbies is ERC721 {
   address admin = 0xc4d78162471cFFd293850C6ed4FD618240a75F1b;   // allowed to push IPFS hashes
 
   string loadingIpfsHash = "QmcZTSMUMvFftMqqUBFy5jVyEXgAGmRSt2X8LqGLBc5QPU";
-  string seedIpfsHash = "QmQo2tQZaQujodPRYQGmYFC6umNhsEwqEsx4mZpPn8uLkc";
+  string seedIpfsHash = "QmXv8Tbvm1hQmzWsSzsMCXGgK7g3tGfLhPWzJQKpodVU1t";
 
   Counters.Counter numberOfTrees;
 

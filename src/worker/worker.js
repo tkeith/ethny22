@@ -81,7 +81,7 @@ async function checkForNewEvents() {
 
       let image;
       if (rarity == 0) {
-        image = "https://demo.storj-ipfs.com/ipfs/QmQo2tQZaQujodPRYQGmYFC6umNhsEwqEsx4mZpPn8uLkc";
+        image = "https://demo.storj-ipfs.com/ipfs/QmXv8Tbvm1hQmzWsSzsMCXGgK7g3tGfLhPWzJQKpodVU1t";
       } else {
         image = "https://demo.storj-ipfs.com/ipfs/QmcZTSMUMvFftMqqUBFy5jVyEXgAGmRSt2X8LqGLBc5QPU";
         // set image to pending image
