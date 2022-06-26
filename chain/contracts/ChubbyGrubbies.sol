@@ -61,8 +61,17 @@ contract ChubbyGrubbies is ERC721 {
     );
   }
 
-  function _generateRarity() internal returns(uint256) {
-    return block.timestamp % 5 + 1; // TODO randomly choose 1-5
+  function _generateRarity() internal view returns(uint256) {
+    uint256 randNum = block.timestamp % 14;
+    uint256 rarity;
+    if (randNum < 8) {
+      rarity = 1;
+    } else if (randNum < 8 + 4) {
+      rarity = 2;
+    } else {
+      rarity = 3;
+    }
+    return rarity; // TODO randomly choose 1-5
   }
 
   function isTree(uint256 tokenId) public view returns(bool) {
